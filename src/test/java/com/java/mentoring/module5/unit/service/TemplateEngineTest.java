@@ -3,11 +3,11 @@ package com.java.mentoring.module5.unit.service;
 import com.java.mentoring.module5.exception.ArgumentNullException;
 import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
+import com.java.mentoring.module5.tags.UnhappyCase;
 import com.java.mentoring.module5.utils.TemplateEngine;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -64,7 +64,7 @@ class TemplateEngineTest {
         Assertions.assertEquals(getExpectedResult(), output);
     }
 
-    @Test
+    @UnhappyCase
     void generateWithMissingValue() {
         Assertions.assertThrows(ArgumentNullException.class, () -> templateEngine.generate(Template.builder()
                 .path("/template/sample-template.html")
