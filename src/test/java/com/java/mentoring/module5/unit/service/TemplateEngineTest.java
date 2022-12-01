@@ -4,12 +4,16 @@ import com.java.mentoring.module5.exception.ArgumentNullException;
 import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
 import com.java.mentoring.module5.utils.TemplateEngine;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -22,7 +26,7 @@ class TemplateEngineTest {
     private TemplateEngine templateEngine;
 
     @Test
-    void generateWithValidValues() {
+    void generateWithValidValues() throws IOException {
         String output = templateEngine.generate(Template.builder()
                 .path("/template/sample-template.html")
                 .values(Map.ofEntries(
@@ -30,7 +34,7 @@ class TemplateEngineTest {
                         new AbstractMap.SimpleEntry<>("test1", "Test 1")
                 )).build(), Client.builder().addresses("abc@gmail.com;def@gmail.com").build());
 
-        Assertions.assertEquals("\"<html>\\r\\n<head>\\r\\n    <style>\\r\\n\\t\\t<!-- put your css here -->\\r\\n\\r\\n\\r\\n    </style>\\r\\n</head>\\r\\n<body>\\r\\n<div class=\\\"container\\\" style=\\\"padding-top: 100px;\\\">\\r\\n    <div class=\\\"row justify-content-center\\\">\\r\\n        <div class=\\\"col-md-6\\\">\\r\\n            <table class=\\\"table table-bordered\\\">\\r\\n                <thead class=\\\"thead-light\\\">\\r\\n                <tr>\\r\\n                    <th>Name ©¥</th>\\r\\n                    <th>Address</th>\\r\\n                </tr>\\r\\n                </thead>\\r\\n                <tbody>\\r\\n                <tr>\\r\\n                    <td>Test ä®</td>\\r\\n                    <td>Test 1</td>\\r\\n                </tr>\\r\\n                </tbody>\\r\\n            </table>\\r\\n        </div>\\r\\n    </div>\\r\\n</div>\\r\\n</body>\\r\\n</html>\"", output);
+        Assertions.assertEquals(getExpectedResult(), output);
     }
 
     @Test
@@ -43,15 +47,22 @@ class TemplateEngineTest {
     }
 
     @Test
-    void generateWithRedundantValues() {
+    void generateWithRedundantValues() throws IOException {
         String output = templateEngine.generate(Template.builder()
                 .path("/template/sample-template.html")
                 .values(Map.ofEntries(
-                        new AbstractMap.SimpleEntry<>("test", "Test"),
+                        new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                         new AbstractMap.SimpleEntry<>("test1", "Test 1"),
                         new AbstractMap.SimpleEntry<>("test2", "Test 2")
                 )).build(), Client.builder().addresses("abc@gmail.com;def@gmail.com").build());
 
-        Assertions.assertEquals("\"<html>\\r\\n<head>\\r\\n    <style>\\r\\n\\t\\t<!-- put your css here -->\\r\\n\\r\\n\\r\\n    </style>\\r\\n</head>\\r\\n<body>\\r\\n<div class=\\\"container\\\" style=\\\"padding-top: 100px;\\\">\\r\\n    <div class=\\\"row justify-content-center\\\">\\r\\n        <div class=\\\"col-md-6\\\">\\r\\n            <table class=\\\"table table-bordered\\\">\\r\\n                <thead class=\\\"thead-light\\\">\\r\\n                <tr>\\r\\n                    <th>Name ©¥</th>\\r\\n                    <th>Address</th>\\r\\n                </tr>\\r\\n                </thead>\\r\\n                <tbody>\\r\\n                <tr>\\r\\n                    <td>Test</td>\\r\\n                    <td>Test 1</td>\\r\\n                </tr>\\r\\n                </tbody>\\r\\n            </table>\\r\\n        </div>\\r\\n    </div>\\r\\n</div>\\r\\n</body>\\r\\n</html>\"", output);
+        Assertions.assertEquals(getExpectedResult(), output);
+    }
+
+    private String getExpectedResult() throws IOException {
+        var input = StringUtils.class.getResourceAsStream("/test-output/sample-generated-template.html");
+        var expected = IOUtils.toString(input, StandardCharsets.UTF_8);
+
+        return expected;
     }
 }
