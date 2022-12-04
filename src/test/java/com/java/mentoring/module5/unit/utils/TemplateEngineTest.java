@@ -1,4 +1,4 @@
-package com.java.mentoring.module5.unit.service;
+package com.java.mentoring.module5.unit.utils;
 
 import com.java.mentoring.module5.exception.ArgumentNullException;
 import com.java.mentoring.module5.model.Client;
@@ -43,7 +43,8 @@ class TemplateEngineTest {
                 Arguments.of("/template/sample-template.html", Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                         new AbstractMap.SimpleEntry<>("test1", "Test 1"),
-                        new AbstractMap.SimpleEntry<>("test2", "Test 2")
+                        new AbstractMap.SimpleEntry<>("test2", "Test 2"),
+                        new AbstractMap.SimpleEntry<>("test3", "Test 3")
                 )),
                 Arguments.of("/template/sample-template.html", Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test", "Test ä®"),
