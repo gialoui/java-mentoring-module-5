@@ -24,6 +24,10 @@ public class MessengerService {
      * @param template
      */
     public void sendEmailInConsoleMode(Client client, Template template) {
+        if (client == null || template == null) {
+            throw new IllegalArgumentException();
+        }
+
         String messageContent = templateEngine.generate(template, client);
         mailServer.send(client.getAddresses(), messageContent);
     }
