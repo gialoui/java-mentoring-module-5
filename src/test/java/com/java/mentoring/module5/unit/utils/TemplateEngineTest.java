@@ -2,6 +2,7 @@ package com.java.mentoring.module5.unit.utils;
 
 import com.java.mentoring.module5.exception.NullArgumentException;
 import com.java.mentoring.module5.extensions.EnvironmentExtension;
+import com.java.mentoring.module5.extensions.TestExecutionLogExtension;
 import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
 import com.java.mentoring.module5.tags.UnhappyCase;
@@ -33,6 +34,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  */
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(EnvironmentExtension.class)
+@ExtendWith(TestExecutionLogExtension.class)
 class TemplateEngineTest {
     private static final String CLIENT_ADDRESSES = "abc@gmail.com;def@gmail.com";
 
