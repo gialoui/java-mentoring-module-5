@@ -1,6 +1,7 @@
 package com.java.mentoring.module5.unit.utils;
 
-import com.java.mentoring.module5.exception.ArgumentNullException;
+import com.java.mentoring.module5.exception.NullArgumentException;
+import com.java.mentoring.module5.extensions.EnvironmentExtension;
 import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
 import com.java.mentoring.module5.tags.UnhappyCase;
@@ -31,7 +32,10 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  * @author khangndd
  */
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(EnvironmentExtension.class)
 class TemplateEngineTest {
+    private static final String CLIENT_ADDRESSES = "abc@gmail.com;def@gmail.com";
+
     @Spy
     private TemplateEngine templateEngine;
 
@@ -60,28 +64,28 @@ class TemplateEngineTest {
                                  Map<String, String> values) throws IOException {
         String output = templateEngine.generate(Template.builder()
                 .path(templatePath)
-                .values(values).build(), Client.builder().addresses("abc@gmail.com;def@gmail.com").build());
+                .values(values).build(), Client.builder().addresses(CLIENT_ADDRESSES).build());
 
         Assertions.assertEquals(getExpectedResult(), output);
     }
 
     @UnhappyCase
     void generateWithMissingValue() {
-        Assertions.assertThrows(ArgumentNullException.class, () -> templateEngine.generate(Template.builder()
+        Assertions.assertThrows(NullArgumentException.class, () -> templateEngine.generate(Template.builder()
                 .path("/template/sample-template.html")
                 .values(Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test1", "Test 1")
-                )).build(), Client.builder().addresses("abc@gmail.com;def@gmail.com").build()));
+                )).build(), Client.builder().addresses(CLIENT_ADDRESSES).build()));
     }
 
     @TestFactory
     Collection<DynamicTest> dynamicTestsFromCollection() {
         return List.of(
-                dynamicTest("1st dynamic test", () -> Assertions.assertThrows(ArgumentNullException.class, () -> templateEngine.generate(Template.builder()
+                dynamicTest("1st dynamic test", () -> Assertions.assertThrows(NullArgumentException.class, () -> templateEngine.generate(Template.builder()
                         .path("/template/sample-template.html")
                         .values(Map.ofEntries(
                                 new AbstractMap.SimpleEntry<>("test1", "Test 1")
-                        )).build(), Client.builder().addresses("abc@gmail.com;def@gmail.com").build()))),
+                        )).build(), Client.builder().addresses(CLIENT_ADDRESSES).build()))),
                 dynamicTest("2nd dynamic test", () -> {
                     String output = templateEngine.generate(Template.builder()
                             .path("/template/sample-template.html")
@@ -89,7 +93,7 @@ class TemplateEngineTest {
                                     new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                                     new AbstractMap.SimpleEntry<>("test1", "Test 1"),
                                     new AbstractMap.SimpleEntry<>("test2", "Test 2")
-                            )).build(), Client.builder().addresses("abc@gmail.com;def@gmail.com").build());
+                            )).build(), Client.builder().addresses(CLIENT_ADDRESSES).build());
 
                     Assertions.assertEquals(getExpectedResult(), output);
                 })

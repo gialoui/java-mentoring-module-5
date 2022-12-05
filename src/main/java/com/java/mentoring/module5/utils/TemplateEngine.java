@@ -1,6 +1,6 @@
 package com.java.mentoring.module5.utils;
 
-import com.java.mentoring.module5.exception.ArgumentNullException;
+import com.java.mentoring.module5.exception.NullArgumentException;
 import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
 import org.apache.commons.io.IOUtils;
@@ -30,7 +30,7 @@ public class TemplateEngine {
                 String placeholder = m.group(1);
 
                 if (!template.getValues().containsKey(placeholder)) {
-                    throw new ArgumentNullException();
+                    throw new NullArgumentException();
                 } else {
                     templateContent = templateContent.replace(String.format("#{%s}", placeholder), template.getValues().get(new String(placeholder.getBytes(), StandardCharsets.UTF_8)));
                 }

@@ -1,9 +1,11 @@
 package com.java.mentoring.module5.unit.service;
 
+import com.java.mentoring.module5.extensions.EnvironmentExtension;
 import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
 import com.java.mentoring.module5.service.MailServer;
 import com.java.mentoring.module5.service.MessengerService;
+import com.java.mentoring.module5.utils.Constants;
 import com.java.mentoring.module5.utils.TemplateEngine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,10 @@ import static org.mockito.Mockito.when;
  * @author khangndd
  */
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(EnvironmentExtension.class)
 class MessengerServiceTest {
+    private static final String CLIENT_ADDRESSES = "abc@gmail.com;def@gmail.com";
+
     @Mock
     TemplateEngine templateEngine;
 
@@ -45,7 +50,7 @@ class MessengerServiceTest {
     private static Stream<Arguments> provideInvalidDataForConsoleMode() {
         return Stream.of(
                 Arguments.of(null, null),
-                Arguments.of(Client.builder().addresses("abc@gmail.com;def@gmail.com").build(), null),
+                Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), null),
                 Arguments.of(null, Template.builder()
                         .path("/template/sample-template.html")
                         .values(Map.ofEntries(
@@ -59,7 +64,9 @@ class MessengerServiceTest {
     @ParameterizedTest
     @MethodSource("provideInvalidDataForConsoleMode")
     void testSendEmailWithInvalidArgsInConsoleMode(Client client, Template template) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> messengerService.sendEmailInConsoleMode(client, template));
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> messengerService.sendEmailInConsoleMode(client, template));
+
+        Assertions.assertEquals(Constants.ERROR_MISSING_ARGS, exception.getMessage());
     }
 
     @Test
@@ -68,7 +75,7 @@ class MessengerServiceTest {
         when(templateEngine.generate(any(Template.class), any(Client.class))).thenCallRealMethod();
         doNothing().when(mailServer).send(anyString(), anyString());
 
-        messengerService.sendEmailInConsoleMode(Client.builder().addresses("abc@gmail.com;def@gmail.com").build(), Template.builder()
+        messengerService.sendEmailInConsoleMode(Client.builder().addresses(CLIENT_ADDRESSES).build(), Template.builder()
                 .path("/template/sample-template.html")
                 .values(Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test", "Test ä®"),
@@ -84,16 +91,18 @@ class MessengerServiceTest {
         return Stream.of(
                 Arguments.of(null, null, null, null),
                 Arguments.of(null, "input-template.html", "params.txt", "output-file.html"),
-                Arguments.of(Client.builder().addresses("abc@gmail.com;def@gmail.com").build(), null, "params.txt", "output-file.html"),
-                Arguments.of(Client.builder().addresses("abc@gmail.com;def@gmail.com").build(), "input-template.html", null, "output-file.html"),
-                Arguments.of(Client.builder().addresses("abc@gmail.com;def@gmail.com").build(), "input-template.html", "params.txt", null)
+                Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), null, "params.txt", "output-file.html"),
+                Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), "input-template.html", null, "output-file.html"),
+                Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), "input-template.html", "params.txt", null)
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidDataForFileMode")
     void testSendEmailWithInvalidArgsInFileMode(Client client, String inputFileName, String paramsFileName, String outputFileName) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> messengerService.sendEmailInFileMode(client, inputFileName, paramsFileName, outputFileName));
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> messengerService.sendEmailInFileMode(client, inputFileName, paramsFileName, outputFileName));
+
+        Assertions.assertEquals(Constants.ERROR_MISSING_ARGS, exception.getMessage());
     }
 
     @Test
@@ -102,7 +111,7 @@ class MessengerServiceTest {
         when(templateEngine.generate(any(Template.class), any(Client.class))).thenCallRealMethod();
         doNothing().when(mailServer).send(anyString(), anyString());
 
-        messengerService.sendEmailInFileMode(Client.builder().addresses("abc@gmail.com;def@gmail.com").build(), "input-template.html", "params.txt", "output-file.html");
+        messengerService.sendEmailInFileMode(Client.builder().addresses(CLIENT_ADDRESSES).build(), "input-template.html", "params.txt", "output-file.html");
 
         verify(templateEngine).generate(any(Template.class), any(Client.class));
         verify(mailServer).send(anyString(), anyString());
