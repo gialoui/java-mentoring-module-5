@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 @Validated
 public class MessengerService {
+    public static final String MISSING_REQUIRED_ARG = "Required args should not be null";
     @Autowired
     private TemplateEngine templateEngine;
 
@@ -27,12 +28,14 @@ public class MessengerService {
     private MailServer mailServer;
 
     /**
+     * Build and send email via console mode
+     *
      * @param client
      * @param template
      */
     public void sendEmailInConsoleMode(Client client, Template template) {
         if (client == null || template == null) {
-            throw new IllegalArgumentException("Required args should not be null");
+            throw new IllegalArgumentException(MISSING_REQUIRED_ARG);
         }
 
         String messageContent = templateEngine.generate(template, client);
@@ -40,6 +43,8 @@ public class MessengerService {
     }
 
     /**
+     * Build and send email via file mode
+     *
      * @param client
      * @param inputFileName
      * @param paramsFileName
@@ -50,7 +55,7 @@ public class MessengerService {
                                     String paramsFileName,
                                     String outputFileName) throws IOException {
         if (client == null || StringUtils.isBlank(inputFileName) || StringUtils.isBlank(paramsFileName) || StringUtils.isBlank(outputFileName)) {
-            throw new IllegalArgumentException("Required args should not be null");
+            throw new IllegalArgumentException(MISSING_REQUIRED_ARG);
         }
 
         File paramsFile = new File(paramsFileName);
