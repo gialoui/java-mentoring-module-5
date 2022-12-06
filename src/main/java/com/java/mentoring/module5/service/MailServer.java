@@ -12,5 +12,5 @@ public interface MailServer {
      * @param addresses      the addresses
      * @param messageContent the message content
      */
-    public void send(String addresses, String messageContent);
+    String send(String addresses, String messageContent);
 }
