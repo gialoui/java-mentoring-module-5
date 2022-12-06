@@ -41,7 +41,8 @@ class CliHelperTest {
         return Stream.of(
                 Arguments.of(Constants.INPUT_FILE_PATH_ARG, FILE_ARGS.get(Constants.INPUT_FILE_PATH_ARG), Constants.PARAMS_FILE_PATH_ARG, FILE_ARGS.get(Constants.PARAMS_FILE_PATH_ARG), null, null),
                 Arguments.of(Constants.INPUT_FILE_PATH_ARG, FILE_ARGS.get(Constants.INPUT_FILE_PATH_ARG), null, null, null, null),
-                Arguments.of(null, null, null, null, null, null)
+                Arguments.of(null, null, Constants.PARAMS_FILE_PATH_ARG, FILE_ARGS.get(Constants.PARAMS_FILE_PATH_ARG), null, null),
+                Arguments.of(null, null, Constants.PARAMS_FILE_PATH_ARG, FILE_ARGS.get(Constants.PARAMS_FILE_PATH_ARG), Constants.OUTPUT_FILE_PATH_ARG, FILE_ARGS.get(Constants.OUTPUT_FILE_PATH_ARG))
         );
     }
 
