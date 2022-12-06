@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.AbstractMap;
 import java.util.List;
@@ -44,6 +45,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(TestExecutionLogExtension.class)
 class MessengerServiceTest {
     private static final String CLIENT_ADDRESSES = "abc@gmail.com;def@gmail.com";
+    private static final String RESOURCE_DIR = "src/test/resources";
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
@@ -134,15 +136,17 @@ class MessengerServiceTest {
     }
 
     @Test
-    void testSendEmailInFileModeSuccessfully() throws IOException {
+    void testSendEmailInFileModeSuccessfully() throws IOException, URISyntaxException {
         // Partial mock
         when(templateEngine.generate(any(Template.class), any(Client.class))).thenCallRealMethod();
 
         var GENERATED_EMAIL = "Generated email";
         when(mailServer.send(anyString(), anyString())).thenReturn(GENERATED_EMAIL);
 
+        var INPUT_FILE_PATH = new File(RESOURCE_DIR + "/files-to-process/input-template.html").getAbsolutePath();
+        var PARAMS_FILE_PATH = new File(RESOURCE_DIR + "/files-to-process/params.txt").getAbsolutePath();
         var OUTPUT_FILE_PATH = testTempDir.getAbsolutePath() + "/output-file.html";
-        messengerService.sendEmailInFileMode(Client.builder().addresses(CLIENT_ADDRESSES).build(), "files-to-process/input-template.html", "files-to-process/params.txt", OUTPUT_FILE_PATH);
+        messengerService.sendEmailInFileMode(Client.builder().addresses(CLIENT_ADDRESSES).build(), INPUT_FILE_PATH, PARAMS_FILE_PATH, OUTPUT_FILE_PATH);
 
         File outputFile = new File(OUTPUT_FILE_PATH);
         Assertions.assertTrue(outputFile.exists() && !outputFile.isDirectory());

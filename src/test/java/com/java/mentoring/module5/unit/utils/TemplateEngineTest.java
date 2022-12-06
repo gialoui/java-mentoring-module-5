@@ -19,6 +19,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 @ExtendWith(TestExecutionLogExtension.class)
 class TemplateEngineTest {
     private static final String CLIENT_ADDRESSES = "abc@gmail.com;def@gmail.com";
+    private static final String SAMPLE_TEMPLATE_HTML = new File("src/main/resources/template/sample-template.html").getAbsolutePath();
 
     @Spy
     private TemplateEngine templateEngine;
@@ -46,13 +48,13 @@ class TemplateEngineTest {
      */
     private static Stream<Arguments> provideDataToGenerate() {
         return Stream.of(
-                Arguments.of("/template/sample-template.html", Map.ofEntries(
+                Arguments.of(SAMPLE_TEMPLATE_HTML, Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                         new AbstractMap.SimpleEntry<>("test1", "Test 1"),
                         new AbstractMap.SimpleEntry<>("test2", "Test 2"),
                         new AbstractMap.SimpleEntry<>("test3", "Test 3")
                 )),
-                Arguments.of("/template/sample-template.html", Map.ofEntries(
+                Arguments.of(SAMPLE_TEMPLATE_HTML, Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                         new AbstractMap.SimpleEntry<>("test1", "Test 1"),
                         new AbstractMap.SimpleEntry<>("test2", "Test 2")
@@ -74,7 +76,7 @@ class TemplateEngineTest {
     @UnhappyCase
     void generateWithMissingValue() {
         Assertions.assertThrows(NullArgumentException.class, () -> templateEngine.generate(Template.builder()
-                .path("/template/sample-template.html")
+                .path(SAMPLE_TEMPLATE_HTML)
                 .values(Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test1", "Test 1")
                 )).build(), Client.builder().addresses(CLIENT_ADDRESSES).build()));
@@ -84,13 +86,13 @@ class TemplateEngineTest {
     Collection<DynamicTest> dynamicTestsFromCollection() {
         return List.of(
                 dynamicTest("1st dynamic test", () -> Assertions.assertThrows(NullArgumentException.class, () -> templateEngine.generate(Template.builder()
-                        .path("/template/sample-template.html")
+                        .path(SAMPLE_TEMPLATE_HTML)
                         .values(Map.ofEntries(
                                 new AbstractMap.SimpleEntry<>("test1", "Test 1")
                         )).build(), Client.builder().addresses(CLIENT_ADDRESSES).build()))),
                 dynamicTest("2nd dynamic test", () -> {
                     String output = templateEngine.generate(Template.builder()
-                            .path("/template/sample-template.html")
+                            .path(SAMPLE_TEMPLATE_HTML)
                             .values(Map.ofEntries(
                                     new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                                     new AbstractMap.SimpleEntry<>("test1", "Test 1"),
