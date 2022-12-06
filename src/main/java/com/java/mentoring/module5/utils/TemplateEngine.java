@@ -3,10 +3,10 @@ package com.java.mentoring.module5.utils;
 import com.java.mentoring.module5.exception.NullArgumentException;
 import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
@@ -19,8 +19,7 @@ import java.util.regex.Pattern;
 public class TemplateEngine {
     public String generate(Template template, Client client) {
         try {
-            var input = StringUtils.class.getResourceAsStream(template.getPath());
-            var templateContent = IOUtils.toString(input, StandardCharsets.UTF_8);
+            var templateContent = FileUtils.readFileToString(new File(template.getPath()), StandardCharsets.UTF_8);
 
             String pattern = "(?<=\\#\\{)(.*?)(?=\\})";
             Pattern r = Pattern.compile(pattern);

@@ -8,6 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Collectors;
+
 /**
  * @author khangndd
  */
@@ -30,7 +36,7 @@ public class MessengerService {
         }
 
         String messageContent = templateEngine.generate(template, client);
-        mailServer.send(client.getAddresses(), messageContent);
+        System.out.println(mailServer.send(client.getAddresses(), messageContent));
     }
 
     /**
@@ -42,13 +48,22 @@ public class MessengerService {
     public void sendEmailInFileMode(Client client,
                                     String inputFileName,
                                     String paramsFileName,
-                                    String outputFileName) {
+                                    String outputFileName) throws IOException {
         if (client == null || StringUtils.isBlank(inputFileName) || StringUtils.isBlank(paramsFileName) || StringUtils.isBlank(outputFileName)) {
             throw new IllegalArgumentException("Required args should not be null");
         }
 
-        var template = Template.builder().build();
+        File paramsFile = new File(paramsFileName);
+
+        var template = Template.builder()
+                .path(inputFileName)
+                .values(Files.readAllLines(paramsFile.toPath()).stream()
+                        .map(item -> item.split("="))
+                        .collect(Collectors.toMap(value -> value[0], value -> value[1]))).build();
         var messageContent = templateEngine.generate(template, client);
-        mailServer.send(client.getAddresses(), messageContent);
+        String emailContent = mailServer.send(client.getAddresses(), messageContent);
+
+        // Write to output file
+        Files.write(Paths.get(outputFileName), emailContent.getBytes());
     }
 }

@@ -25,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.AbstractMap;
 import java.util.List;
@@ -48,6 +47,8 @@ class MessengerServiceTest {
     private static final String RESOURCE_DIR = "src/test/resources";
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    private static final String SAMPLE_TEMPLATE_HTML = new File(RESOURCE_DIR + "/files-to-process/input-template.html").getAbsolutePath();
+    private static final String SAMPLE_PARAMS_FILE = new File(RESOURCE_DIR + "/files-to-process/params.txt").getAbsolutePath();
 
     @TempDir
     File testTempDir;
@@ -79,7 +80,7 @@ class MessengerServiceTest {
                 Arguments.of(null, null),
                 Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), null),
                 Arguments.of(null, Template.builder()
-                        .path("/template/sample-template.html")
+                        .path(SAMPLE_TEMPLATE_HTML)
                         .values(Map.ofEntries(
                                 new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                                 new AbstractMap.SimpleEntry<>("test1", "Test 1"),
@@ -105,22 +106,22 @@ class MessengerServiceTest {
         when(mailServer.send(anyString(), anyString())).thenReturn(GENERATED_EMAIL);
 
         messengerService.sendEmailInConsoleMode(Client.builder().addresses(CLIENT_ADDRESSES).build(), Template.builder()
-                .path("/template/sample-template.html")
+                .path(SAMPLE_TEMPLATE_HTML)
                 .values(Map.ofEntries(
                         new AbstractMap.SimpleEntry<>("test", "Test ä®"),
                         new AbstractMap.SimpleEntry<>("test1", "Test 1"),
                         new AbstractMap.SimpleEntry<>("test2", "Test 2")
                 )).build());
 
-        Assertions.assertEquals(GENERATED_EMAIL, outputStreamCaptor.toString().trim());
         verify(templateEngine).generate(any(Template.class), any(Client.class));
         verify(mailServer).send(anyString(), anyString());
+        Assertions.assertEquals(GENERATED_EMAIL, outputStreamCaptor.toString().trim());
     }
 
     private static Stream<Arguments> provideInvalidDataForFileMode() {
         return Stream.of(
                 Arguments.of(null, null, null, null),
-                Arguments.of(null, "files-to-process/input-template.html", "files-to-process/params.txt", "output-file.html"),
+                Arguments.of(null, SAMPLE_TEMPLATE_HTML, SAMPLE_PARAMS_FILE, "output-file.html"),
                 Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), null, "files-to-process/params.txt", "output-file.html"),
                 Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), "files-to-process/input-template.html", null, "output-file.html"),
                 Arguments.of(Client.builder().addresses(CLIENT_ADDRESSES).build(), "files-to-process/input-template.html", "files-to-process/params.txt", null)
@@ -136,17 +137,15 @@ class MessengerServiceTest {
     }
 
     @Test
-    void testSendEmailInFileModeSuccessfully() throws IOException, URISyntaxException {
+    void testSendEmailInFileModeSuccessfully() throws IOException {
         // Partial mock
         when(templateEngine.generate(any(Template.class), any(Client.class))).thenCallRealMethod();
 
         var GENERATED_EMAIL = "Generated email";
         when(mailServer.send(anyString(), anyString())).thenReturn(GENERATED_EMAIL);
 
-        var INPUT_FILE_PATH = new File(RESOURCE_DIR + "/files-to-process/input-template.html").getAbsolutePath();
-        var PARAMS_FILE_PATH = new File(RESOURCE_DIR + "/files-to-process/params.txt").getAbsolutePath();
         var OUTPUT_FILE_PATH = testTempDir.getAbsolutePath() + "/output-file.html";
-        messengerService.sendEmailInFileMode(Client.builder().addresses(CLIENT_ADDRESSES).build(), INPUT_FILE_PATH, PARAMS_FILE_PATH, OUTPUT_FILE_PATH);
+        messengerService.sendEmailInFileMode(Client.builder().addresses(CLIENT_ADDRESSES).build(), SAMPLE_TEMPLATE_HTML, SAMPLE_PARAMS_FILE, OUTPUT_FILE_PATH);
 
         File outputFile = new File(OUTPUT_FILE_PATH);
         Assertions.assertTrue(outputFile.exists() && !outputFile.isDirectory());
