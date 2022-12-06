@@ -1,6 +1,7 @@
 package com.java.mentoring.module5.unit.service;
 
 import com.java.mentoring.module5.service.MailServerConsole;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.io.PrintStream;
  */
 @ExtendWith(MockitoExtension.class)
 class MailServerConsoleTest {
+    private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     @Spy
@@ -24,6 +26,11 @@ class MailServerConsoleTest {
     @BeforeEach
     public void setUp() {
         System.setOut(new PrintStream(outputStreamCaptor));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        System.setOut(standardOut);
     }
 
     @Test
