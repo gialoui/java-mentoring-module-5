@@ -14,9 +14,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -33,6 +36,12 @@ class CliHelperTest {
             new AbstractMap.SimpleEntry<>(Constants.OUTPUT_FILE_PATH_ARG, "temp")
     );
     private static final String[] FILE_ARGS_ARRAY = FILE_ARGS.entrySet().stream().flatMap(item -> Stream.of(item.getKey(), item.getValue())).toArray(String[]::new);
+    private static final Map<String, String> PARAMS_MAP = Map.ofEntries(
+            new AbstractMap.SimpleEntry<>("test", "Test ä®"),
+            new AbstractMap.SimpleEntry<>("test1", "Test 1"),
+            new AbstractMap.SimpleEntry<>("test2", "Test 2"),
+            new AbstractMap.SimpleEntry<>("test3", "Test 3")
+    );
 
     @Spy
     private CliHelper cliHelper;
@@ -62,5 +71,26 @@ class CliHelperTest {
     @MethodSource("provideInvalidDataForFileMode")
     void detectFileModeWithInvalidArgs_shouldThrowException(String key1, String value1, String key2, String value2, String key3, String value3) {
         Assertions.assertThrows(IllegalArgumentException.class, () -> cliHelper.identifyMode(Stream.of(key1, value1, key2, value2, key3, value3).filter(Objects::nonNull).toArray(String[]::new)));
+    }
+
+    @Test
+    void readParamsFromConsole_shouldSuccess() {
+        ByteArrayInputStream inputStreamCaptor1 = buildInputStreamFromMapParams(PARAMS_MAP);
+        System.setIn(inputStreamCaptor1);
+
+        var result = cliHelper.readParamsFromConsole(System.in);
+        Assertions.assertEquals(PARAMS_MAP, result);
+    }
+
+    /**
+     * @param params
+     * @return
+     */
+    private ByteArrayInputStream buildInputStreamFromMapParams(Map<String, String> params) {
+        String inputString = params.keySet().stream()
+                .map(key -> key + "=" + params.get(key))
+                .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
+
+        return new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
     }
 }

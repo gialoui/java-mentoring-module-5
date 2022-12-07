@@ -3,8 +3,11 @@ package com.java.mentoring.module5.utils;
 import com.java.mentoring.module5.enums.MessengerMode;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * @author khangndd
@@ -27,5 +30,9 @@ public class CliHelper {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    public Map<String, String> readParamsFromConsole(InputStream inputStream) {
+        return new HashMap<>();
     }
 }
