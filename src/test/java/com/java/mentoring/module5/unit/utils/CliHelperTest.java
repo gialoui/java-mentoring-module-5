@@ -95,6 +95,12 @@ class CliHelperTest {
         Assertions.assertThrows(WrongParamsFormatException.class, () -> cliHelper.readParamsFromConsole(System.in));
     }
 
+    @Test
+    void readArgsInFileMode_shouldSuccess() {
+        var result = cliHelper.readArgsInFileMode(FILE_ARGS_ARRAY);
+        Assertions.assertEquals(FILE_ARGS, result);
+    }
+
     /**
      * @param params
      * @return

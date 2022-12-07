@@ -35,6 +35,22 @@ public class CliHelper {
         }
     }
 
+    /**
+     * Reading arguments for FILE mode
+     *
+     * @param args
+     * @return
+     */
+    public Map<String, String> readArgsInFileMode(final String... args) {
+        return new HashMap<>();
+    }
+
+    /**
+     * Reading parameters from console
+     *
+     * @param inputStream
+     * @return
+     */
     public Map<String, String> readParamsFromConsole(InputStream inputStream) {
         try (Scanner scanner = new Scanner(inputStream, String.valueOf(StandardCharsets.UTF_8))) {
             System.out.format("Enter parameters for template in format parameterName=parameterValue%n"
