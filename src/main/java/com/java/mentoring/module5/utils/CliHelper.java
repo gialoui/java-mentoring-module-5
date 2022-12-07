@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author khangndd
@@ -42,7 +44,20 @@ public class CliHelper {
      * @return
      */
     public Map<String, String> readArgsInFileMode(final String... args) {
-        return new HashMap<>();
+        var argsMap = Constants.ALL_FILE_ARGS.stream()
+                .collect(Collectors.toMap(Function.identity(), s -> "temp"));
+
+        for (int i = 0; i < args.length; i++) {
+            final int finalI = i;
+
+            if (finalI % 2 == 0) {
+                Constants.ALL_FILE_ARGS.stream()
+                        .filter(arg -> arg.equals(args[finalI]))
+                        .forEach(arg -> argsMap.put(arg, args[finalI + 1]));
+            }
+        }
+
+        return argsMap;
     }
 
     /**
