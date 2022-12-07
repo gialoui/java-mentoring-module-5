@@ -62,14 +62,14 @@ class Module5ApplicationTest {
 
     @Test
     void runInFileMode_shouldSuccess() throws IOException {
-        when(cliHelper.identifyMode(any(String[].class))).thenReturn(MessengerMode.FILE);
-        when(cliHelper.readArgsInFileMode(any(String[].class))).thenReturn(new HashMap<>());
+        when(cliHelper.identifyMode(FILE_ARGS_ARRAY)).thenReturn(MessengerMode.FILE);
+        when(cliHelper.readArgsInFileMode(FILE_ARGS_ARRAY)).thenReturn(FILE_ARGS);
         doNothing().when(messengerService).sendEmailInFileMode(any(Client.class), anyString(), anyString(), anyString());
 
         application.run(FILE_ARGS_ARRAY);
 
-        verify(cliHelper).identifyMode();
-        verify(cliHelper).readArgsInFileMode(any(String[].class));
+        verify(cliHelper).identifyMode(FILE_ARGS_ARRAY);
+        verify(cliHelper).readArgsInFileMode(FILE_ARGS_ARRAY);
         verify(messengerService).sendEmailInFileMode(any(Client.class), anyString(), anyString(), anyString());
     }
 }
