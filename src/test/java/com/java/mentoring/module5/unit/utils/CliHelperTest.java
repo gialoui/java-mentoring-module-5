@@ -1,6 +1,7 @@
 package com.java.mentoring.module5.unit.utils;
 
 import com.java.mentoring.module5.enums.MessengerMode;
+import com.java.mentoring.module5.exception.WrongParamsFormatException;
 import com.java.mentoring.module5.extensions.EnvironmentExtension;
 import com.java.mentoring.module5.extensions.TestExecutionLogExtension;
 import com.java.mentoring.module5.utils.CliHelper;
@@ -75,11 +76,23 @@ class CliHelperTest {
 
     @Test
     void readParamsFromConsole_shouldSuccess() {
-        ByteArrayInputStream inputStreamCaptor1 = buildInputStreamFromMapParams(PARAMS_MAP);
-        System.setIn(inputStreamCaptor1);
+        ByteArrayInputStream inputStreamCaptor = buildInputStreamFromMapParams(PARAMS_MAP);
+        System.setIn(inputStreamCaptor);
 
         var result = cliHelper.readParamsFromConsole(System.in);
         Assertions.assertEquals(PARAMS_MAP, result);
+    }
+
+    @Test
+    void readParamsFromConsole_shouldFailedWithWrongFormat() {
+        String inputString = PARAMS_MAP.keySet().stream()
+                .map(key -> key + ":" + PARAMS_MAP.get(key))
+                .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
+
+        ByteArrayInputStream inputStreamCaptor = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
+        System.setIn(inputStreamCaptor);
+
+        Assertions.assertThrows(WrongParamsFormatException.class, () -> cliHelper.readParamsFromConsole(System.in));
     }
 
     /**
