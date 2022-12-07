@@ -68,8 +68,7 @@ public class CliHelper {
      */
     public Map<String, String> readParamsFromConsole(InputStream inputStream) {
         try (Scanner scanner = new Scanner(inputStream, String.valueOf(StandardCharsets.UTF_8))) {
-            System.out.format("Enter parameters for template in format parameterName=parameterValue%n"
-                    + "end entering parameters with new line %n");
+            System.out.println("Enter parameters for template in format parameterName=parameterValue and enter new parameter in a new line");
             String parameterLine;
             var params = new HashMap<String, String>();
             while (scanner.hasNextLine()) {
