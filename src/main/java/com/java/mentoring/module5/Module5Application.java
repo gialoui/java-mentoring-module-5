@@ -5,6 +5,7 @@ import com.java.mentoring.module5.model.Client;
 import com.java.mentoring.module5.model.Template;
 import com.java.mentoring.module5.service.MessengerService;
 import com.java.mentoring.module5.utils.CliHelper;
+import com.java.mentoring.module5.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
+import java.io.IOException;
 
 @SpringBootApplication
 @Slf4j
@@ -42,6 +44,13 @@ public class Module5Application implements CommandLineRunner {
             messengerService.sendEmailInConsoleMode(client, Template.builder()
                     .path(new File(RESOURCE_DIR + "/template/sample-template.html").getAbsolutePath())
                     .values(params).build());
+        } else {
+            try {
+                var argsMap = cliHelper.readArgsInFileMode(args);
+                messengerService.sendEmailInFileMode(client, argsMap.get(Constants.INPUT_FILE_PATH_ARG), argsMap.get(Constants.PARAMS_FILE_PATH_ARG), argsMap.get(Constants.OUTPUT_FILE_PATH_ARG));
+            } catch(IOException ex) {
+                log.error("There was an error reading files: ", ex);
+            }
         }
     }
 }
