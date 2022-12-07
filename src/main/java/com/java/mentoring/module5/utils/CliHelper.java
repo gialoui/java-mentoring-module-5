@@ -1,6 +1,7 @@
 package com.java.mentoring.module5.utils;
 
 import com.java.mentoring.module5.enums.MessengerMode;
+import com.java.mentoring.module5.exception.WrongParamsFormatException;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -49,6 +50,11 @@ public class CliHelper {
                 }
 
                 final String[] parameterParts = parameterLine.split("=", 2);
+
+                if (parameterParts.length != 2) {
+                    throw new WrongParamsFormatException("Parameters format is incorrect");
+                }
+
                 params.put(parameterParts[0], parameterParts[1]);
             }
 
