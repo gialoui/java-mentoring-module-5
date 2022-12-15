@@ -66,6 +66,72 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.4</version>
+                <executions>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <title>JaCoCo</title>
+                            <footer>Code Coverage Report for JaCoCo ${project.version}</footer>
+                            <includes>
+                                <!-- Analyze class files only to exclude shaded agent JAR from report -->
+                                <include>**/*.class</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/HelpMojo.class</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <target xmlns:jacoco="antlib:org.jacoco.ant">
+                                //this task is to provide class/src files locations for jacoco report generation
+                                <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+                                    <classpath path="${project.build.directory}"/>
+                                </taskdef>
+                                <jacoco:report>
+                                    <executiondata>
+                                        <file file="${project.build.directory}/jacoco.exec"/>
+                                    </executiondata>
+                                    <structure name="Sample Tests">
+                                        <classfiles>
+                                            <fileset dir="../module5/target/classes"/>
+                                        </classfiles>
+                                        <sourcefiles encoding="UTF-8">
+                                            <fileset dir="../module5/src"/>
+                                        </sourcefiles>
+                                    </structure>
+                                    <html destdir="${project.build.directory}/site/jacoco"/>
+                                </jacoco:report>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>org.jacoco.ant</artifactId>
+                        <version>0.8.8</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 
